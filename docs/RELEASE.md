@@ -57,7 +57,6 @@ Khi chạy `pnpm release`, release-it tự động publish lên npm (cấu hình
 Người dùng cài qua: `npx conf-mcp@latest` hoặc `npm i -g conf-mcp`.
 
 Lưu ý:
-
 - Field `files` trong `package.json` giới hạn chỉ đóng gói `dist/` (không publish `src/`, `scripts/`, `.env`).
 - Script `prepare` tự chạy `npm run build` trước khi publish → `dist/index.js` luôn mới.
 
@@ -80,7 +79,6 @@ Sau khi chạy `pnpm release` xong, chạy `pnpm archive` để đóng gói zip 
 - [ ] Local branch updated, tất cả changes đã commit
 
 release-it sẽ tự động:
-
 - [ ] Chạy lint + build
 - [ ] Bump version trong package.json
 - [ ] Commit, tag, push

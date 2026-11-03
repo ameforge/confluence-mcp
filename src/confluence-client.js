@@ -21,9 +21,12 @@ const HEADERS = {
 };
 
 export const confluenceRequest = async (method, path, body) => {
+  const multipart = body instanceof FormData;
+  // fetch sets the multipart boundary itself; Confluence rejects uploads without the XSRF opt-out.
+  const {"Content-Type": _, ...base} = HEADERS;
   const res = await fetch(`${BASE}${path}`, {
-    body: body ? JSON.stringify(body) : undefined,
-    headers: HEADERS,
+    body: multipart ? body : body ? JSON.stringify(body) : undefined,
+    headers: multipart ? {...base, "X-Atlassian-Token": "nocheck"} : HEADERS,
     method,
   });
   if (!res.ok) {
@@ -44,13 +47,18 @@ export const readForEdit = (pageId) =>
 /**
  * Write a page's storage body, auto-incrementing the version.
  * @param {string} pageId
- * @param {{value: string, current: any, title?: string}} opts
+ * Pass `parentId` (and `spaceKey` if the parent is in another space) to move it.
+ * @param {{value: string, current: any, title?: string, parentId?: string, spaceKey?: string}} opts
  */
-export const writePage = (pageId, {value, current, title}) =>
+export const writePage = (
+  pageId,
+  {value, current, title, parentId, spaceKey},
+) =>
   confluenceRequest("PUT", `/content/${pageId}`, {
+    ...(parentId && {ancestors: [{id: parentId}]}),
     body: {storage: {representation: "storage", value}},
     id: pageId,
-    space: {key: current.space.key},
+    space: {key: spaceKey ?? current.space.key},
     title: title ?? current.title,
     type: "page",
     version: {number: current.version.number + 1},

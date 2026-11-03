@@ -48,19 +48,21 @@ Restart Claude Code/Desktop after editing the config.
 
 ## Tools
 
-| Tool                | Description                                                     | Key parameters                                                                                   |
-| ------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `get_page`          | Get a page by numeric content ID                                | `page_id`, `body_format` (optional), `body_start` (optional), `body_limit` (optional)            |
-| `get_page_by_title` | Get a page by space key + exact title                           | `space_key`, `title`, `body_format` (optional), `body_start` (optional), `body_limit` (optional) |
-| `create_page`       | Create a new page                                               | `space_key`, `title`, `body`, `body_format` (optional), `parent_page_id` (optional)              |
-| `update_page`       | Update a page (full replace, auto-increments version)           | `page_id`, `title` (optional), `body` (optional), `body_format` (optional)                       |
-| `patch_page`        | Replace a substring in a page (storage format only)             | `page_id`, `old_string`, `new_string`                                                            |
-| `delete_page`       | Move a page to trash (recoverable, not permanently purged)      | `page_id`                                                                                        |
-| `search_pages`      | Search content using CQL (Confluence Query Language)            | `cql`, `limit` (optional), `start` (optional)                                                    |
-| `list_spaces`       | List spaces, or fetch a single space by key                     | `space_key` (optional), `limit` (optional)                                                       |
-| `add_comment`       | Add a comment to a page                                         | `page_id`, `body`                                                                                |
-| `get_comments`      | Get comments on a page                                          | `page_id`                                                                                        |
-| `get_user`          | Resolve a user's display name and profile from userKey/username | `key` or `username`                                                                              |
+| Tool                | Description                                                     | Key parameters                                                                                    |
+| ------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `get_page`          | Get a page by numeric content ID                                | `page_id`, `body_format` (optional), `body_start` (optional), `body_limit` (optional)             |
+| `get_page_by_title` | Get a page by space key + exact title                           | `space_key`, `title`, `body_format` (optional), `body_start` (optional), `body_limit` (optional)  |
+| `create_page`       | Create a new page                                               | `space_key`, `title`, `body`, `body_format` (optional), `parent_page_id` (optional)               |
+| `update_page`       | Update a page (full replace, auto-increments version)           | `page_id`, `title` (optional), `body` (optional), `body_format` (optional)                        |
+| `patch_page`        | Replace a substring in a page (storage format only)             | `page_id`, `old_string`, `new_string`                                                             |
+| `delete_page`       | Move a page to trash (recoverable, not permanently purged)      | `page_id`                                                                                         |
+| `move_page`         | Move a page (and its children) under a new parent, any space    | `page_id`, `parent_id`                                                                            |
+| `upload_attachment` | Attach a local file to a page (overwrite=true: new version)     | `page_id`, `file_path`, `file_name` (optional), `comment` (optional), `overwrite` (default false) |
+| `search_pages`      | Search content using CQL (Confluence Query Language)            | `cql`, `limit` (optional), `start` (optional)                                                     |
+| `list_spaces`       | List spaces, or fetch a single space by key                     | `space_key` (optional), `limit` (optional)                                                        |
+| `add_comment`       | Add a comment to a page                                         | `page_id`, `body`                                                                                 |
+| `get_comments`      | Get comments on a page                                          | `page_id`                                                                                         |
+| `get_user`          | Resolve a user's display name and profile from userKey/username | `key` or `username`                                                                               |
 
 ### Notes
 
@@ -100,7 +102,7 @@ Or point at a local build:
 {
   "command": "node",
   "args": ["/path/to/conf-mcp/dist/index.js"],
-  "env": { "...": "..." }
+  "env": {"...": "..."}
 }
 ```
 
@@ -117,7 +119,7 @@ pnpm archive           # package release/conf-mcp-v<version>.zip
 
 ## Support
 
-Questions or issues? Email [namcp@gem-corp.global](mailto:namcp@gem-corp.global).
+Questions or issues? Email [pnamhn16@gmail.com](mailto:pnamhn16@gmail.com).
 
 If this project helps you, consider buying me a coffee:
 
@@ -125,4 +127,4 @@ If this project helps you, consider buying me a coffee:
 
 ---
 
-Created by [NamCP](mailto:namcp@gem-corp.global)
+Created by [PNam](mailto:pnamhn16@gmail.com)

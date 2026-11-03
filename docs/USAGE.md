@@ -46,7 +46,7 @@ Khởi động lại Claude Code/Desktop sau khi sửa config.
     "conf-mcp": {
       "command": "npx",
       "args": ["-y", "github:pnam16/gem-conf-mcp"],
-      "env": { "...": "..." }
+      "env": {"...": "..."}
     }
   }
 }
@@ -65,7 +65,7 @@ Khởi động lại Claude Code/Desktop sau khi sửa config.
     "conf-mcp": {
       "command": "node",
       "args": ["/path/to/conf-mcp/index.js"],
-      "env": { "...": "..." }
+      "env": {"...": "..."}
     }
   }
 }
@@ -81,19 +81,21 @@ Khởi động lại Claude Code/Desktop sau khi sửa config.
 
 ## Danh sách công cụ (tools)
 
-| Tool                | Chức năng                                                        | Tham số chính                                                                                    |
-| ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `get_page`          | Lấy chi tiết một trang theo ID                                   | `page_id`, `body_format` (tùy chọn), `body_start` (tùy chọn), `body_limit` (tùy chọn)            |
-| `get_page_by_title` | Lấy trang theo space key + tiêu đề chính xác                     | `space_key`, `title`, `body_format` (tùy chọn), `body_start` (tùy chọn), `body_limit` (tùy chọn) |
-| `create_page`       | Tạo trang mới                                                    | `space_key`, `title`, `body`, `body_format` (tùy chọn), `parent_page_id` (tùy chọn)              |
-| `update_page`       | Cập nhật trang (thay thế toàn bộ, tự tăng version)               | `page_id`, `title` (tùy chọn), `body` (tùy chọn), `body_format` (tùy chọn)                       |
-| `patch_page`        | Thay thế một chuỗi con trong trang (storage format chỉ)          | `page_id`, `old_string`, `new_string`                                                            |
-| `delete_page`       | Chuyển trang vào thùng rác (khôi phục được, không xóa vĩnh viễn) | `page_id`                                                                                        |
-| `search_pages`      | Tìm kiếm bằng CQL (Confluence Query Language)                    | `cql`, `limit` (tùy chọn), `start` (tùy chọn)                                                    |
-| `list_spaces`       | Liệt kê space, hoặc lấy 1 space theo key                         | `space_key` (tùy chọn), `limit` (tùy chọn)                                                       |
-| `add_comment`       | Thêm comment vào trang                                           | `page_id`, `body`                                                                                |
-| `get_comments`      | Lấy danh sách comment của trang                                  | `page_id`                                                                                        |
-| `get_user`          | Tra tên hiển thị + hồ sơ user từ userKey hoặc username           | `key` hoặc `username`                                                                            |
+| Tool                | Chức năng                                                          | Tham số chính                                                                                      |
+| ------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `get_page`          | Lấy chi tiết một trang theo ID                                     | `page_id`, `body_format` (tùy chọn), `body_start` (tùy chọn), `body_limit` (tùy chọn)              |
+| `get_page_by_title` | Lấy trang theo space key + tiêu đề chính xác                       | `space_key`, `title`, `body_format` (tùy chọn), `body_start` (tùy chọn), `body_limit` (tùy chọn)   |
+| `create_page`       | Tạo trang mới                                                      | `space_key`, `title`, `body`, `body_format` (tùy chọn), `parent_page_id` (tùy chọn)                |
+| `update_page`       | Cập nhật trang (thay thế toàn bộ, tự tăng version)                 | `page_id`, `title` (tùy chọn), `body` (tùy chọn), `body_format` (tùy chọn)                         |
+| `patch_page`        | Thay thế một chuỗi con trong trang (storage format chỉ)            | `page_id`, `old_string`, `new_string`                                                              |
+| `delete_page`       | Chuyển trang vào thùng rác (khôi phục được, không xóa vĩnh viễn)   | `page_id`                                                                                          |
+| `move_page`         | Chuyển trang (kèm trang con) sang trang cha mới, kể cả khác space  | `page_id`, `parent_id`                                                                             |
+| `upload_attachment` | Đính kèm file local vào trang (overwrite=true: ghi đè version mới) | `page_id`, `file_path`, `file_name` (tùy chọn), `comment` (tùy chọn), `overwrite` (mặc định false) |
+| `search_pages`      | Tìm kiếm bằng CQL (Confluence Query Language)                      | `cql`, `limit` (tùy chọn), `start` (tùy chọn)                                                      |
+| `list_spaces`       | Liệt kê space, hoặc lấy 1 space theo key                           | `space_key` (tùy chọn), `limit` (tùy chọn)                                                         |
+| `add_comment`       | Thêm comment vào trang                                             | `page_id`, `body`                                                                                  |
+| `get_comments`      | Lấy danh sách comment của trang                                    | `page_id`                                                                                          |
+| `get_user`          | Tra tên hiển thị + hồ sơ user từ userKey hoặc username             | `key` hoặc `username`                                                                              |
 
 ### Lưu ý quan trọng
 
@@ -120,4 +122,4 @@ Khởi động lại Claude Code/Desktop sau khi sửa config.
 
 ---
 
-Được tạo bởi [NamCP](namcp@gem-corp.global)
+Được tạo bởi [PNam](mailto:pnamhn16@gmail.com)

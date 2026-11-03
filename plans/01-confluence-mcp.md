@@ -5,7 +5,6 @@
 conf-mcp is a scaffold copy of the working jira-mcp server (D:\ws\lab\jira-mcp) — same package.json, tsconfig.json, biome.json, scripts/build.js, scripts/release.js (hash-verified identical). src/ is empty. Goal: implement an MCP server for the companion Confluence instance, mirroring jira-mcp's architecture exactly rather than inventing new conventions.
 
 Confirmed target (live-probed, cross-checked by two independent methods):
-
 - Host: https://conf.gem-corp.tech
 - Product: Confluence Server/Data Center 6.11.0, build 7801 (confirmed via `ajs-version-number` meta tag on the login page — not inferred)
 - REST API base: https://conf.gem-corp.tech/rest/api (root context path, no `/wiki` prefix, no Cloud v2 surface — `/wiki/api/v2/spaces` returns 404)
@@ -28,7 +27,6 @@ Source: full read of every file in D:\ws\lab\jira-mcp\src.
 | `.default()` usage on a zod field                                          | jira-mcp/src/tools/search-tickets.js:15-19 |
 
 Exact facts to replicate, not reinterpret:
-
 - SDK imports are subpath-specific: `import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"` and `import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js"` (index.js:1-2).
 - `new McpServer({name, version})` — no `capabilities` key used.
 - Each tool file exports one `registerX(server)` function; index.js imports all of them and calls each explicitly (index.js:15-23) — not a loop over an array.
@@ -60,7 +58,6 @@ Source: developer.atlassian.com/server/confluence/\* and docs.atlassian.com/atla
 | List/add attachments    | `GET`/`POST /content/{id}/child/attachment`                             | POST is multipart/form-data, requires header `X-Atlassian-Token: nocheck`                                                                              |
 
 Confirmed anti-patterns / gotchas (do not skip these):
-
 1. Reads return a bare skeleton unless `expand` is passed. `GET /content/{id}` alone omits body, version, and space. Every read tool must pass an explicit `expand`.
 2. Update requires the full representation plus an incremented `version.number`, not a partial patch. Sending the current (unincremented) version number is documented to fail — community-attested as 409, not stated in primary docs, so treat the increment rule as certain and the exact status code as needing a smoke test.
 3. Page/comment bodies use Confluence storage format (an XHTML-like dialect), set via `representation:"storage"` — not Markdown. Tool descriptions must say this explicitly so a caller doesn't pass raw Markdown.
@@ -69,7 +66,6 @@ Confirmed anti-patterns / gotchas (do not skip these):
 6. Attachment upload needs `X-Atlassian-Token: nocheck` and multipart/form-data — it cannot go through a JSON-only request helper unmodified.
 
 Gaps flagged by research, to be resolved by smoke test rather than assumption:
-
 - Exact status code on stale-version update (assume 409, verify against the real host).
 - Whether DELETE-to-trash returns a JSON body on its 200 response, or an empty body (see Phase 2 guard below).
 - Whether the comment `container` object needs `type:"page"` or `id` alone (include `type` defensively, verify).
@@ -77,14 +73,15 @@ Gaps flagged by research, to be resolved by smoke test rather than assumption:
 ## Phase 1 — Scaffold conversion, shared client, first tool (spike)
 
 What to implement:
-
 1. `package.json`: change `"name": "jira-mcp"` to `"name": "conf-mcp"` (D:\ws\lab\conf-mcp\package.json:2). This matters because scripts/release.js:9 derives the release zip filename from `pkg.name` — leaving it unchanged would ship a zip named `jira-mcp-v1.0.0.zip`.
 2. `.env.example`: replace contents entirely —
+
    ```
    CONFLUENCE_HOST=https://conf.gem-corp.tech
    CONFLUENCE_USERNAME=your_username
    CONFLUENCE_PASSWORD=your_password
    ```
+
    Drop `JIRA_START_DATE_FIELD` — no Confluence equivalent.
 3. `.env` (local, gitignored, not committed): add real `CONFLUENCE_HOST`/`CONFLUENCE_USERNAME`/`CONFLUENCE_PASSWORD` values. Do not remove the existing JIRA*\* keys if this .env is shared with other tooling — just add the CONFLUENCE*\* keys alongside them.
 4. `src/confluence-client.js` — copy jira-mcp/src/jira-client.js:1-31 structure exactly:
@@ -179,7 +176,6 @@ What to implement:
    ```
 
 Verification checklist:
-
 - `pnpm install` succeeds.
 - `pnpm run lint` (biome check --write . && tsc --noEmit) — zero errors, zero warnings.
 - `pnpm run build` (esbuild) succeeds, produces `dist/index.js`.
@@ -187,7 +183,6 @@ Verification checklist:
 - Authenticated smoke test (blocked on the user supplying real CONFLUENCE_USERNAME/CONFLUENCE_PASSWORD in .env — this cannot be completed without them): register conf-mcp with an MCP client (same way jira-mcp is registered), call `get_page` against a real page ID, and confirm the response contains `body.storage.value`. This is also the check for whether `server.registerTool`'s `inputSchema` accepts a `z.object({...})` wrapper as jira-mcp uses it — if it does not, jira-mcp has the same latent issue and both should be fixed the same way (unwrap to a raw shape object), not just this one.
 
 Anti-pattern guards:
-
 - Do not add a startup env-var validation block — jira-mcp has none; match it.
 - Do not invent a `capabilities` option on `McpServer` — jira-mcp doesn't pass one.
 - Do not skip `expand` on the GET — without it the response has no body/version/space.
@@ -211,12 +206,12 @@ Handler builds:
 
 ```js
 const payload = {
-  body: { storage: { representation: "storage", value: body } },
-  space: { key: space_key },
+  body: {storage: {representation: "storage", value: body}},
+  space: {key: space_key},
   title,
   type: "page",
 };
-if (parent_page_id) payload.ancestors = [{ id: parent_page_id }];
+if (parent_page_id) payload.ancestors = [{id: parent_page_id}];
 const created = await confluenceRequest("POST", "/content", payload);
 ```
 
@@ -245,10 +240,10 @@ const payload = {
     },
   },
   id: page_id,
-  space: { key: current.space.key },
+  space: {key: current.space.key},
   title: title ?? current.title,
   type: "page",
-  version: { number: current.version.number + 1 },
+  version: {number: current.version.number + 1},
 };
 const updated = await confluenceRequest("PUT", `/content/${page_id}`, payload);
 ```
@@ -274,7 +269,6 @@ Anti-pattern guard specific to this phase — verify before trusting:
 The shared `confluenceRequest` helper (Phase 1) does `if (res.status === 204) return null; return res.json();`. Research found that DELETE-to-trash returns HTTP 200, not 204 — and neither the docs nor the live probe confirmed whether that 200 response has a JSON body. If it's an empty 200 (common for DELETE endpoints), `res.json()` will throw on an empty body and `delete_page` will report a false failure on a successful delete. Before relying on `delete_page`, make one real DELETE call against a disposable test page and inspect the raw response body. If it's empty on 200, make the client tolerant of that case specifically for DELETE (e.g. read the response as text first, return null if empty) — do not silently change this without confirming the actual response first.
 
 Verification checklist:
-
 - `pnpm run lint` clean.
 - Create a real test page in a scratch/sandbox space, confirm `version.number` starts at 1 in the response.
 - Update that same page (change only `title`, omit `body`), confirm the response's `version.number` is 2 and the body content is unchanged.
@@ -347,7 +341,6 @@ const result = await confluenceRequest("GET", `/space?${params}`);
 Live-confirmed envelope shape (from a real unauthenticated probe against the host during research): `{"results":[],"start":0,"limit":25,"size":0,"_links":{"base":"https://conf.gem-corp.tech","context":"","self":"https://conf.gem-corp.tech/rest/api/space"}}`.
 
 Verification checklist:
-
 - `pnpm run lint` clean.
 - `get_page_by_title` resolves a known real page in a real space; returns a clear not-found message for a nonexistent title rather than throwing.
 - `search_pages` with a simple `space=KEY AND type=page` query returns results from a real space.
@@ -366,8 +359,8 @@ inputSchema: z.object({
 
 ```js
 const payload = {
-  body: { storage: { representation: "storage", value: body } },
-  container: { id: page_id, type: "page" },
+  body: {storage: {representation: "storage", value: body}},
+  container: {id: page_id, type: "page"},
   type: "comment",
 };
 const created = await confluenceRequest("POST", "/content", payload);
@@ -384,7 +377,7 @@ inputSchema: z.object({
 ```
 
 ```js
-const params = new URLSearchParams({ expand: "body.view", limit: "50" });
+const params = new URLSearchParams({expand: "body.view", limit: "50"});
 const result = await confluenceRequest(
   "GET",
   `/content/${page_id}/child/comment?${params}`,
@@ -394,7 +387,6 @@ const result = await confluenceRequest(
 Source: docs.atlassian.com/atlassian-confluence/REST/6.6.0/; example confirmed on developer.atlassian.com/server/confluence/confluence-rest-api-examples/.
 
 Verification checklist:
-
 - `pnpm run lint` clean.
 - Add a comment to a real test page, confirm it appears via `get_comments` and in the Confluence UI.
 - Confirm whether `container.type` was actually required (per the gap above) and simplify the payload if not.
@@ -424,7 +416,6 @@ Required header: `X-Atlassian-Token: nocheck` (verified twice against the primar
 Anti-pattern guard: attachment upload cannot go through the Phase 1 `confluenceRequest` helper unmodified — that helper always sets `Content-Type: application/json` and always calls `JSON.stringify(body)`. Add a separate function (e.g. `confluenceUpload`) that accepts a `FormData` body, omits the `Content-Type` header (let `fetch` set the multipart boundary automatically), and adds `X-Atlassian-Token: nocheck`. Do not try to force multipart through the JSON-only helper.
 
 Verification checklist:
-
 - `pnpm run lint` clean.
 - Add a label to a real test page, confirm via `get_labels`.
 - Upload a small test file as an attachment, confirm via `list_attachments` and in the Confluence UI.
@@ -438,6 +429,5 @@ Verification checklist:
 5. Confirm no leftover references to `JIRA_*` env vars anywhere in `src/` (grep for `JIRA_`).
 
 Verification checklist:
-
 - Zero biome warnings, zero tsc errors.
 - Every tool from Phases 1-4 (and 5, if built) invoked at least once against the real Confluence instance with a real result observed, not just a successful build.

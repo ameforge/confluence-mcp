@@ -10,11 +10,10 @@
   },
   "description": "MCP server for Confluence Server/Data Center (REST API)",
   "devDependencies": {
-    "@biomejs/biome": "^2.5.6",
+    "@biomejs/biome": "^2.6.2",
     "@types/node": "^26.1.2",
     "archiver": "^8.0.0",
     "esbuild": "^0.28.1",
-    "prettier": "^3.9.6",
     "release-it": "^20.2.1",
     "typescript": "^6.0.3"
   },
@@ -55,7 +54,7 @@
   "scripts": {
     "archive": "node scripts/build.js && node scripts/archive.js",
     "build": "node scripts/build.js",
-    "lint": "biome check --write . && tsc --noEmit && prettier --write \"**/*.md\"",
+    "lint": "biome migrate --write && biome check --write . && tsc --noEmit",
     "prepare": "npm run build",
     "release": "release-it",
     "start": "node src/index.js",

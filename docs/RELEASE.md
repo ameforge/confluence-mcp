@@ -15,30 +15,16 @@
    ```
 
    release-it sẽ thực hiện tự động:
-   - Lint + build kiểm tra
+   - Chạy lint, test và build để kiểm tra
    - Hỏi phiên bản mới (patch/minor/major)
    - Commit với message "chore: release v${version}"
    - Tạo git tag "v${version}"
    - Push commit và tag lên GitHub
    - Mở trang tạo GitHub release (cần điền thủ công trong browser)
 
-   Không cần commit trước; release-it xử lý git operations. Chỉ cần run khi muốn release.
+   Commit mọi thay đổi trước khi chạy: `.release-it.json` đặt `requireCleanWorkingDir: true`, nên release-it dừng lại nếu working tree chưa sạch. Bước commit version, tag và push thì release-it tự làm.
 
-2. Đóng gói zip release:
-
-   ```bash
-   pnpm archive
-   ```
-
-   Script này chạy tuần tự:
-   - `scripts/build.js` — bundle `src/index.js` bằng esbuild thành file duy nhất `dist/index.js` (kèm shebang `#!/usr/bin/env node`, không cần `node_modules` khi chạy).
-   - `scripts/archive.js` — đóng gói `release/conf-mcp-v<version>.zip` gồm:
-     - `index.js` (từ `dist/index.js`)
-     - `package.json`
-     - `README.md`
-     - `.env.example`
-
-3. Kiểm tra nhanh sau build:
+2. Kiểm tra nhanh sau build:
 
    ```bash
    node dist/index.js
@@ -52,7 +38,7 @@ Các kênh cài đặt cho người dùng:
 
 ### 1. npm (khuyến nghị)
 
-Khi chạy `pnpm release`, release-it tự động publish lên npm (cấu hình `.release-it.json` có `npm.publish: true`).
+`.release-it.json` để `npm.publish: false`, nên `pnpm release` không tự publish npm; cần chạy `npm publish` riêng sau khi release.
 
 Người dùng cài qua: `npx conf-mcp@latest` hoặc `npm i -g conf-mcp`.
 
@@ -67,11 +53,6 @@ npx github:pnam16/gem-conf-mcp
 ```
 
 Khi cài từ git, npm tự chạy script `prepare` (cấu hình `"prepare": "npm run build"`) để build `dist/index.js`. release-it tự động push tag lên GitHub — chỉ cần đảm bảo repo ở chế độ **public**.
-
-### 3. Zip thủ công (release/conf-mcp-v<version>.zip)
-
-Sau khi chạy `pnpm release` xong, chạy `pnpm archive` để đóng gói zip cho người dùng không có npm/git, xem [Hướng dẫn sử dụng](USAGE.md#cài-đặt-từ-file-zip-release).
-
 ## Checklist trước `pnpm release`
 
 - [ ] Kiểm tra `.env` không bị commit (đã có trong `.gitignore`)
@@ -79,8 +60,9 @@ Sau khi chạy `pnpm release` xong, chạy `pnpm archive` để đóng gói zip 
 - [ ] Local branch updated, tất cả changes đã commit
 
 release-it sẽ tự động:
-- [ ] Chạy lint + build
+- [ ] Chạy lint, test và build
 - [ ] Bump version trong package.json
 - [ ] Commit, tag, push
-- [ ] Publish npm
 - [ ] Mở browser để tạo GitHub release (copy changelog + submit form)
+
+Sau khi release xong, chạy `npm publish` (script `prepare` tự build lại `dist/index.js`).

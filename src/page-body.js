@@ -1,3 +1,4 @@
+import {writeFile} from "node:fs/promises";
 import {z} from "zod";
 
 export const bodyParamsSchema = {
@@ -19,6 +20,12 @@ export const bodyParamsSchema = {
     .min(0)
     .optional()
     .describe("Character offset to start the body slice from (default 0)"),
+  save_to: z
+    .string()
+    .optional()
+    .describe(
+      "Absolute local file path to write the full body to (must not exist); the result then carries metadata only. Use for large pages you want to grep or read in parts",
+    ),
 };
 
 const DEFAULT_LIMIT = 40000;
@@ -31,11 +38,11 @@ export const expandForBody = (bodyFormat) => {
 
 /**
  * @param {any} page
- * @param {{body_format?: string, body_start?: number, body_limit?: number}} [opts]
+ * @param {{body_format?: string, body_start?: number, body_limit?: number, save_to?: string}} [opts]
  */
-export const formatPage = (
+export const formatPage = async (
   page,
-  {body_format, body_start, body_limit} = {},
+  {body_format, body_start, body_limit, save_to} = {},
 ) => {
   const format = body_format ?? "storage";
   const start = body_start ?? 0;
@@ -48,6 +55,14 @@ export const formatPage = (
   }
 
   const raw = body?.[format]?.value ?? "";
+  if (save_to) {
+    // "wx" fails with EEXIST instead of silently replacing a local file.
+    await writeFile(save_to, raw, {flag: "wx"});
+    return JSON.stringify({
+      ...rest,
+      body: {body_length: raw.length, format, saved_to: save_to},
+    });
+  }
   const slice = raw.slice(start, start + limit);
   const end = start + slice.length;
 

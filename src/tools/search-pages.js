@@ -22,7 +22,7 @@ export const registerSearchPages = (server) => {
         cql: z
           .string()
           .describe(
-            "CQL query, e.g. 'type=page AND space=ENG AND title~\"deploy\"'. Fields: space,title,type,text,label,creator,created,lastmodified. Operators: = != ~ !~ > >= < <= IN. Keywords: AND OR NOT ORDER BY",
+            "CQL query, e.g. 'type=page AND space=ENG AND title~\"deploy\"', or 'ancestor=123456' for every page under a page (parent=123456 for direct children only). Fields: space,title,type,text,label,creator,created,lastmodified,ancestor,parent. Operators: = != ~ !~ > >= < <= IN. Keywords: AND OR NOT ORDER BY",
           ),
         limit: z
           .number()

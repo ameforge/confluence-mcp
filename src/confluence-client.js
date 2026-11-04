@@ -37,6 +37,18 @@ export const confluenceRequest = async (method, path, body) => {
   return res.json();
 };
 
+/** Fetch raw bytes from a site-relative path, e.g. an attachment's `_links.download`. */
+export const confluenceDownload = async (path) => {
+  const res = await fetch(`${HOST}${path}`, {
+    headers: {Authorization: HEADERS.Authorization},
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Confluence API ${res.status}: ${text}`);
+  }
+  return Buffer.from(await res.arrayBuffer());
+};
+
 /** Fetch a page with the version/space/body needed to build an edit payload. */
 export const readForEdit = (pageId) =>
   confluenceRequest(
@@ -44,8 +56,16 @@ export const readForEdit = (pageId) =>
     `/content/${pageId}?expand=version,space,body.storage`,
   );
 
+/** Short result for a write, so tools don't echo the whole page body back. */
+export const pageSummary = ({_links, id, title, version}) => ({
+  id,
+  title,
+  url: _links?.webui && `${HOST}${_links.webui}`,
+  version: version?.number,
+});
+
 /**
- * Write a page's storage body, auto-incrementing the version.
+ * Write a page's storage body, auto-incrementing the version. Resolves to a pageSummary.
  * @param {string} pageId
  * Pass `parentId` (and `spaceKey` if the parent is in another space) to move it.
  * @param {{value: string, current: any, title?: string, parentId?: string, spaceKey?: string}} opts
@@ -62,4 +82,4 @@ export const writePage = (
     title: title ?? current.title,
     type: "page",
     version: {number: current.version.number + 1},
-  });
+  }).then(pageSummary);

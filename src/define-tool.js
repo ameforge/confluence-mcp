@@ -15,6 +15,10 @@ export const defineTool = (server, name, config, handler) => {
         typeof result === "string" ? result : JSON.stringify(result, null, 2);
       return {content: [{text, type: "text"}]};
     } catch (err) {
+      // stderr lands in the MCP client's log (stdout is the protocol channel).
+      console.error(
+        `[${new Date().toISOString()}] ${name} failed: ${err.message}`,
+      );
       return {content: [{text: err.message, type: "text"}], isError: true};
     }
   });

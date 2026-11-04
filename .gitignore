@@ -69,9 +69,6 @@ web_modules/
 # Output of 'npm pack'
 *.tgz
 
-# release artifacts
-release/
-
 # Yarn Integrity file
 .yarn-integrity
 

@@ -12,7 +12,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",
     "@types/node": "^26.1.2",
-    "archiver": "^8.0.0",
     "esbuild": "^0.28.1",
     "release-it": "^20.2.1",
     "typescript": "^6.0.3"
@@ -52,7 +51,6 @@
     "url": "git+https://github.com/pnam16/gem-conf-mcp.git"
   },
   "scripts": {
-    "archive": "node scripts/build.js && node scripts/archive.js",
     "build": "node scripts/build.js",
     "lint": "biome migrate --write && biome check --write . && tsc --noEmit",
     "prepare": "npm run build",

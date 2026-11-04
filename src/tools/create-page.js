@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
+import {confluenceRequest, pageSummary} from "../confluence-client.js";
 import {defineTool} from "../define-tool.js";
 import {resolveBody, writeBodyParamsSchema} from "../markdown.js";
 
@@ -18,7 +18,7 @@ export const createPage = async ({
     type: "page",
   };
   if (parent_page_id) payload.ancestors = [{id: parent_page_id}];
-  return confluenceRequest("POST", "/content", payload);
+  return pageSummary(await confluenceRequest("POST", "/content", payload));
 };
 
 export const registerCreatePage = (server) => {

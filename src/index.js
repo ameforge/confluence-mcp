@@ -2,6 +2,7 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js";
 import pkg from "../package.json" with {type: "json"};
 import {registerAddComment} from "./tools/add-comment.js";
+import {registerAttachments} from "./tools/attachments.js";
 import {registerCreatePage} from "./tools/create-page.js";
 import {registerDeletePage} from "./tools/delete-page.js";
 import {registerGetComments} from "./tools/get-comments.js";
@@ -30,7 +31,8 @@ registerGetUser(server);
 registerAddComment(server);
 registerGetComments(server);
 registerUploadAttachment(server);
+registerAttachments(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error("Confluence MCP server running on stdio");
+console.error(`Confluence MCP server v${pkg.version} running on stdio`);

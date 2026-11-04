@@ -27,7 +27,8 @@ test("JSON-stringifies a non-string result", async () => {
   });
 });
 
-test("catches a thrown error into the isError shape", async () => {
+test("catches a thrown error into the isError shape and logs it to stderr", async (t) => {
+  const log = t.mock.method(console, "error", () => {});
   const handle = register(async () => {
     throw new Error("boom");
   });
@@ -35,4 +36,9 @@ test("catches a thrown error into the isError shape", async () => {
     content: [{text: "boom", type: "text"}],
     isError: true,
   });
+  assert.equal(log.mock.callCount(), 1);
+  assert.match(
+    log.mock.calls[0].arguments[0],
+    /^\[\d{4}-\d\d-\d\dT[^\]]+\] t failed: boom$/,
+  );
 });

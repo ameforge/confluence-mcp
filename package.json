@@ -49,11 +49,11 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "prepare": "npm run build",
+    "prepare": "pnpm build",
     "release": "release-it",
     "start": "node src/index.js",
     "test": "node --test"
   },
   "type": "module",
-  "version": "1.5.0"
+  "version": "1.5.1"
 }

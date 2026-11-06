@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {confluenceRequest, pageSummary} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
-import {resolveBody, writeBodyParamsSchema} from "../markdown.js";
+import {confluenceRequest, pageSummary} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
+import {resolveBody, writeBodyParamsSchema} from "../../markdown.js";
 
 export const createPage = async ({
   body,

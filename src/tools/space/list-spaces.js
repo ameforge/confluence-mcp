@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 export const listSpaces = async ({limit = 25, space_key}) => {
   if (space_key) {

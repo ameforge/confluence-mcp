@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 export const addComment = async ({body, page_id}) => {
   const payload = {

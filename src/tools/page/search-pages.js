@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 export const searchPages = async ({cql, limit = 25, start = 0}) => {
   const params = new URLSearchParams({

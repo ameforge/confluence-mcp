@@ -1,6 +1,6 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 export const deletePage = async ({page_id}) => {
   await confluenceRequest("DELETE", `/content/${page_id}`);

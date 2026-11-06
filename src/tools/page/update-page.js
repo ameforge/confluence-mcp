@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {readForEdit, writePage} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
-import {resolveBody, writeBodyParamsSchema} from "../markdown.js";
+import {readForEdit, writePage} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
+import {resolveBody, writeBodyParamsSchema} from "../../markdown.js";
 
 export const updatePage = async ({body, body_format, page_id, title}) => {
   const current = await readForEdit(page_id);

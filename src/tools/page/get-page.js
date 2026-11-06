@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
-import {bodyParamsSchema, expandForBody, formatPage} from "../page-body.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
+import {bodyParamsSchema, expandForBody, formatPage} from "../../page-body.js";
 import {getPageByTitle} from "./get-page-by-title.js";
 
 /** Turn a page ID or a Confluence page URL into {page_id} or {space_key, title}. */

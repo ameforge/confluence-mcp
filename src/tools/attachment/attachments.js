@@ -1,7 +1,10 @@
 import {writeFile} from "node:fs/promises";
 import {z} from "zod";
-import {confluenceDownload, confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+import {
+  confluenceDownload,
+  confluenceRequest,
+} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 // shortcut: one page of up to 200 attachments, add start/limit paging if a page ever holds more.
 const fetchAttachments = (page_id, filename) =>

@@ -1,8 +1,8 @@
 import {readFile} from "node:fs/promises";
 import {basename} from "node:path";
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 export const uploadAttachment = async ({
   comment,

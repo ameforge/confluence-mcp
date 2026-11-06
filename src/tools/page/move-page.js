@@ -3,8 +3,8 @@ import {
   confluenceRequest,
   readForEdit,
   writePage,
-} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
+} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
 
 export const movePage = async ({page_id, parent_id}) => {
   const [current, parent] = await Promise.all([

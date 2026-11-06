@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {parsePageRef} from "../src/tools/get-page.js";
-import {applyEdits} from "../src/tools/patch-page.js";
+import {parsePageRef} from "../src/tools/page/get-page.js";
+import {applyEdits} from "../src/tools/page/patch-page.js";
 
 test("parsePageRef accepts a bare ID and the URL shapes users paste", () => {
   const host = "https://conf.example.com";

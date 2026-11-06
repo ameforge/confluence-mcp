@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {confluenceRequest} from "../confluence-client.js";
-import {defineTool} from "../define-tool.js";
-import {bodyParamsSchema, expandForBody, formatPage} from "../page-body.js";
+import {confluenceRequest} from "../../confluence-client.js";
+import {defineTool} from "../../define-tool.js";
+import {bodyParamsSchema, expandForBody, formatPage} from "../../page-body.js";
 
 export const getPageByTitle = async ({space_key, title, ...opts}) => {
   const params = new URLSearchParams({

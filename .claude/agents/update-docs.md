@@ -34,7 +34,7 @@ Glob `docs/*.md` and always include README.md. Update every file found. Known fi
 3. Rebuild the Tools table (tool | description | key params) in README.md and docs/USAGE.md straight from the schema — never invent params.
 4. Update Notes to match current behavior: write `body_format` markdown vs storage default, the macro limitation (Markdown cannot express code/panel/expand/TOC macros — use storage), read-side pagination + `truncated`.
 5. Confirm every tool registered in src/index.js appears in every tools table. Report any missing or extra.
-6. Cross-check package.json version, bin name, install args (`conf-mcp@latest`, `github:namcpgem/gem-conf-mcp`) against docs.
+6. Cross-check package.json version, bin name, install args (`conf-mcp@latest`) against docs.
 
 ## Rules
 

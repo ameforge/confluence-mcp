@@ -36,7 +36,7 @@
 
 Các kênh cài đặt cho người dùng:
 
-### 1. npm (khuyến nghị)
+### npm (khuyến nghị)
 
 `.release-it.json` để `npm.publish: false`, nên `pnpm release` không tự publish npm; cần chạy `npm publish` riêng sau khi release.
 
@@ -46,14 +46,6 @@ Lưu ý:
 
 - Field `files` trong `package.json` giới hạn chỉ đóng gói `dist/` (không publish `src/`, `scripts/`, `.env`).
 - Script `prepare` tự chạy `npm run build` trước khi publish → `dist/index.js` luôn mới.
-
-### 2. GitHub (git install)
-
-```bash
-npx github:pnam16/gem-conf-mcp
-```
-
-Khi cài từ git, npm tự chạy script `prepare` (cấu hình `"prepare": "npm run build"`) để build `dist/index.js`. release-it tự động push tag lên GitHub — chỉ cần đảm bảo repo ở chế độ **public**.
 
 ## Checklist trước `pnpm release`
 

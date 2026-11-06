@@ -55,11 +55,11 @@ Restart Claude Code/Desktop after editing the config.
 
 ## Environment variables
 
-| Variable              | Required | Description                               |
-| --------------------- | -------- | ----------------------------------------- |
-| `CONFLUENCE_HOST`     | yes      | Base URL, e.g. `https://conf.company.com` |
-| `CONFLUENCE_USERNAME` | yes*     | Confluence username                       |
-| `CONFLUENCE_PASSWORD` | yes*     | Confluence password                       |
+| Variable              | Required | Description                                                     |
+| --------------------- | -------- | --------------------------------------------------------------- |
+| `CONFLUENCE_HOST`     | yes      | Base URL, e.g. `https://conf.company.com`                       |
+| `CONFLUENCE_USERNAME` | yes*     | Confluence username                                             |
+| `CONFLUENCE_PASSWORD` | yes*     | Confluence password                                             |
 | `CONFLUENCE_TOKEN`    | no       | Personal Access Token; when set, replaces username/password (*) |
 
 ## Tools

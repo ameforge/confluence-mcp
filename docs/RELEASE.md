@@ -43,6 +43,7 @@ Các kênh cài đặt cho người dùng:
 Người dùng cài qua: `npx conf-mcp@latest` hoặc `npm i -g conf-mcp`.
 
 Lưu ý:
+
 - Field `files` trong `package.json` giới hạn chỉ đóng gói `dist/` (không publish `src/`, `scripts/`, `.env`).
 - Script `prepare` tự chạy `npm run build` trước khi publish → `dist/index.js` luôn mới.
 
@@ -53,6 +54,7 @@ npx github:pnam16/gem-conf-mcp
 ```
 
 Khi cài từ git, npm tự chạy script `prepare` (cấu hình `"prepare": "npm run build"`) để build `dist/index.js`. release-it tự động push tag lên GitHub — chỉ cần đảm bảo repo ở chế độ **public**.
+
 ## Checklist trước `pnpm release`
 
 - [ ] Kiểm tra `.env` không bị commit (đã có trong `.gitignore`)
@@ -60,6 +62,7 @@ Khi cài từ git, npm tự chạy script `prepare` (cấu hình `"prepare": "np
 - [ ] Local branch updated, tất cả changes đã commit
 
 release-it sẽ tự động:
+
 - [ ] Chạy lint, test và build
 - [ ] Bump version trong package.json
 - [ ] Commit, tag, push

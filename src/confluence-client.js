@@ -16,7 +16,10 @@ const AUTH = Buffer.from(
 ).toString("base64");
 const HEADERS = {
   Accept: "application/json",
-  Authorization: `Basic ${AUTH}`,
+  // A Personal Access Token lets SSO-only accounts (no Confluence password) authenticate.
+  Authorization: process.env.CONFLUENCE_TOKEN
+    ? `Bearer ${process.env.CONFLUENCE_TOKEN.trim()}`
+    : `Basic ${AUTH}`,
   "Content-Type": "application/json",
 };
 

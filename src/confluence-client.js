@@ -23,7 +23,12 @@ const HEADERS = {
   "Content-Type": "application/json",
 };
 
-export const confluenceRequest = async (method, path, body) => {
+// Data Center answers transient 429/5xx under load. Only GET is replayed: a
+// 500 on a write may already have saved it.
+const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
+const MAX_RETRIES = 2;
+
+export const confluenceRequest = async (method, path, body, attempt = 0) => {
   const multipart = body instanceof FormData;
   // fetch sets the multipart boundary itself; Confluence rejects uploads without the XSRF opt-out.
   const {"Content-Type": _, ...base} = HEADERS;
@@ -33,6 +38,14 @@ export const confluenceRequest = async (method, path, body) => {
     method,
   });
   if (!res.ok) {
+    if (
+      method === "GET" &&
+      attempt < MAX_RETRIES &&
+      RETRY_STATUS.has(res.status)
+    ) {
+      await new Promise((r) => setTimeout(r, 250 * 2 ** attempt));
+      return confluenceRequest(method, path, body, attempt + 1);
+    }
     const text = await res.text();
     throw new Error(`Confluence API ${res.status}: ${text}`);
   }

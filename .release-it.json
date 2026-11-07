@@ -10,7 +10,7 @@
     "tagName": "conf-v${version}"
   },
   "github": {
-    "release": true,
+    "release": false,
     "releaseName": "conf-mcp v${version}"
   },
   "hooks": {

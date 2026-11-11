@@ -15,9 +15,9 @@ test("parsePageRef accepts a bare ID and the URL shapes users paste", () => {
   });
   assert.deepEqual(
     parsePageRef(
-      `${host}/display/KJMTP2/%5B08-11-2026%5D%5BGEM+Team%5D+Release+Note`,
+      `${host}/display/TEAM/%5B08-11-2026%5D%5BCore+Team%5D+Release+Note`,
     ),
-    {space_key: "KJMTP2", title: "[08-11-2026][GEM Team] Release Note"},
+    {space_key: "TEAM", title: "[08-11-2026][Core Team] Release Note"},
   );
   assert.deepEqual(parsePageRef(`${host}/display/ENG/C%2B%2B+Guide`), {
     space_key: "ENG",

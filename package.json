@@ -15,27 +15,28 @@
   ],
   "keywords": [
     "mcp",
+    "mcp-server",
     "model-context-protocol",
     "confluence",
     "confluence-server",
     "confluence-data-center",
     "atlassian",
-    "rest-api",
-    "claude",
-    "claude-code",
-    "codex",
-    "gemini",
-    "cursor",
-    "windsurf",
-    "llm",
-    "ai",
-    "ai-tools",
-    "agent",
+    "self-hosted",
+    "on-premise",
+    "cql",
     "wiki",
     "knowledge-base",
-    "cql",
-    "confluence-api",
-    "server"
+    "documentation",
+    "claude",
+    "claude-code",
+    "claude-desktop",
+    "cursor",
+    "windsurf",
+    "codex",
+    "gemini",
+    "ai",
+    "ai-agent",
+    "llm"
   ],
   "license": "MIT",
   "main": "dist/index.js",
@@ -43,7 +44,7 @@
   "repository": {
     "directory": "packages/confluence",
     "type": "git",
-    "url": "git+https://github.com/pnam16/atlassian-mcp.git"
+    "url": "git+https://github.com/ameforge/atlassian-mcp.git"
   },
   "scripts": {
     "build": "rsbuild build",
@@ -53,5 +54,5 @@
     "test": "node --test"
   },
   "type": "module",
-  "version": "1.5.2"
+  "version": "1.6.0"
 }

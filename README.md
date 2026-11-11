@@ -62,12 +62,12 @@ Official setup guides:
 
 ## Environment variables
 
-| Variable              | Required | Description                                                     |
-| --------------------- | -------- | --------------------------------------------------------------- |
-| `CONFLUENCE_HOST`     | yes      | Base URL, e.g. `https://conf.company.com`                       |
-| `CONFLUENCE_USERNAME` | yes*     | Confluence username                                             |
-| `CONFLUENCE_PASSWORD` | yes*     | Confluence password                                             |
-| `CONFLUENCE_TOKEN`    | no       | Personal Access Token; when set, replaces username/password (*) |
+| Variable              | Required | Description                                                        |
+| --------------------- | -------- | ------------------------------------------------------------------ |
+| `CONFLUENCE_HOST`     | yes      | Base URL, e.g. `https://conf.company.com`                          |
+| `CONFLUENCE_USERNAME` | yes*     | Confluence username; `ATLASSIAN_USERNAME` is read when it is unset |
+| `CONFLUENCE_PASSWORD` | yes*     | Confluence password; `ATLASSIAN_PASSWORD` is read when it is unset |
+| `CONFLUENCE_TOKEN`    | no       | Personal Access Token; when set, replaces username/password (*)    |
 
 ## Tools
 
@@ -114,7 +114,7 @@ Official setup guides:
 - 401/403: recheck `CONFLUENCE_USERNAME`/`CONFLUENCE_PASSWORD` and whether the account can access the space.
 - Connection/timeout: verify `CONFLUENCE_HOST` format (starts with `https://`, no trailing `/`), and whether VPN/internal network is required.
 - Error logs: every failed tool call is written to stderr with a timestamp and the tool name, and the startup line shows the server version. On Windows, Claude Code keeps this in `%LOCALAPPDATA%\claude-cli-nodejs\Cache\<project>\mcp-logs-<server name>\`, where `<server name>` is the name you gave the server in your MCP config (for example `conf-mcp`).
-- Reporting a bug: open an issue at <https://github.com/pnam16/gem-conf-mcp/issues> with the server version, the tool you called and the matching log lines. Logs can contain page content and internal URLs, so remove anything sensitive before you post. Nothing is sent anywhere automatically.
+- Reporting a bug: open an issue at <https://github.com/ameforge/atlassian-mcp/issues> with the server version, the tool you called and the matching log lines. Logs can contain page content and internal URLs, so remove anything sensitive before you post. Nothing is sent anywhere automatically.
 
 ## Development
 
@@ -122,9 +122,10 @@ Official setup guides:
 pnpm install
 cp .env.example .env   # edit with your credentials
 pnpm build             # bundle to dist/index.js via rsbuild
-pnpm lint              # biome check + tsc
-pnpm release           # release-it: runs lint, test and build, then bumps version, commits, tags, pushes (commit your changes first; pnpm publish is a separate step)
+pnpm test
 ```
+
+Release from the repo root with `pnpm release:conf`; see [docs/RELEASE.md](https://github.com/ameforge/atlassian-mcp/blob/main/docs/RELEASE.md).
 
 ## Support
 
@@ -132,7 +133,7 @@ Questions or issues? Email [PNam](mailto:pnamhn16@gmail.com).
 
 If this project helps you, consider buying me a coffee:
 
-<img src="https://raw.githubusercontent.com/pnam16/gem-conf-mcp/main/docs/buy-me-a-coffee.jpg" alt="Buy Me A Coffee" width="300">
+<img src="https://raw.githubusercontent.com/ameforge/atlassian-mcp/main/docs/buy-me-a-coffee.jpg" alt="Buy Me A Coffee" width="300">
 
 ---
 

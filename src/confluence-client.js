@@ -11,8 +11,9 @@ const HOST = (process.env.CONFLUENCE_HOST ?? "")
   .replace(/^["']|["']$/g, "")
   .replace(/\/+$/, "");
 const BASE = `${HOST}/rest/api`;
+// ATLASSIAN_*: one account shared with Jira, set once for atlassian-mcp.
 const AUTH = Buffer.from(
-  `${process.env.CONFLUENCE_USERNAME}:${process.env.CONFLUENCE_PASSWORD}`,
+  `${process.env.CONFLUENCE_USERNAME || process.env.ATLASSIAN_USERNAME}:${process.env.CONFLUENCE_PASSWORD || process.env.ATLASSIAN_PASSWORD}`,
 ).toString("base64");
 const HEADERS = {
   Accept: "application/json",

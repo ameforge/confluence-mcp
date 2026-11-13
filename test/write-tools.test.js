@@ -4,7 +4,8 @@ import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {test} from "node:test";
 import {uploadAttachment} from "../src/tools/attachment/upload-attachment.js";
-import {movePage} from "../src/tools/page/move-page.js";
+import {registerDeletePage} from "../src/tools/page/delete-page.js";
+import {movePage, registerMovePage} from "../src/tools/page/move-page.js";
 import {updatePage} from "../src/tools/page/update-page.js";
 
 // Records each request and answers from `reply(method, path)`.
@@ -89,4 +90,53 @@ test("move_page keeps the body and takes the space of the new parent", async () 
   assert.equal(body.space.key, "OTHER");
   assert.deepEqual(body.ancestors, [{id: "7"}]);
   assert.equal(body.version.number, 4);
+});
+
+const tools = (register) => {
+  const map = new Map();
+  register({registerTool: (name, _config, handler) => map.set(name, handler)});
+  return map;
+};
+
+test("delete_pages trashes every page and reports the one that failed", async () => {
+  const sent = [];
+  globalThis.fetch = async (url, init) => {
+    sent.push(`${init.method} ${new URL(url, "http://x").pathname}`);
+    if (String(url).endsWith("/2")) {
+      return {ok: false, status: 404, text: async () => "gone"};
+    }
+    return {json: async () => ({}), ok: true, status: 204};
+  };
+
+  const result = await tools(registerDeletePage).get("delete_pages")({
+    page_ids: ["1", "2", "3"],
+  });
+
+  assert.equal(sent.length, 3);
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /1 of 3 failed/);
+  assert.match(result.content[0].text, /^.*Page 1 moved to trash/m);
+  assert.match(result.content[0].text, /Page 3 moved to trash/);
+});
+
+test("move_pages moves every page under the same parent", async () => {
+  const sent = stubFetch((_method, path) =>
+    path === "/content/7"
+      ? {space: {key: "OTHER"}, title: "P"}
+      : {
+          body: {storage: {value: "<p>x</p>"}},
+          space: {key: "ENG"},
+          title: "T",
+          version: {number: 1},
+        },
+  );
+
+  const result = await tools(registerMovePage).get("move_pages")({
+    page_ids: ["41", "42"],
+    parent_id: "7",
+  });
+
+  const puts = sent.filter((r) => r.method === "PUT").map((r) => r.path);
+  assert.deepEqual(puts, ["/content/41", "/content/42"]);
+  assert.equal(result.isError, undefined);
 });

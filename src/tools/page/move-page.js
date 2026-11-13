@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {runBatch} from "../../batch.js";
 import {
   confluenceRequest,
   readForEdit,
@@ -35,5 +36,25 @@ export const registerMovePage = (server) => {
       }),
     },
     movePage,
+  );
+
+  defineTool(
+    server,
+    "move_pages",
+    {
+      description:
+        "Move several Confluence pages (each with its children) under the same new parent page, including a parent in another space. Pages are processed in order; a failure on one does not stop the rest, and the result lists each page's outcome",
+      inputSchema: z.object({
+        page_ids: z
+          .array(z.string())
+          .min(1)
+          .describe("Confluence page/content IDs to move"),
+        parent_id: z
+          .string()
+          .describe("ID of the page that becomes the new parent"),
+      }),
+    },
+    ({page_ids, parent_id}) =>
+      runBatch(page_ids, (page_id) => movePage({page_id, parent_id})),
   );
 };

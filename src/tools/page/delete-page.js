@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {runBatch} from "../../batch.js";
 import {confluenceRequest} from "../../confluence-client.js";
 import {defineTool} from "../../define-tool.js";
 
@@ -21,5 +22,21 @@ export const registerDeletePage = (server) => {
       }),
     },
     deletePage,
+  );
+
+  defineTool(
+    server,
+    "delete_pages",
+    {
+      description:
+        "Move several Confluence pages to trash (recoverable). Does not permanently purge. Pages are processed in order; a failure on one does not stop the rest, and the result lists each page's outcome",
+      inputSchema: z.object({
+        page_ids: z
+          .array(z.string())
+          .min(1)
+          .describe("Confluence page/content IDs to move to trash"),
+      }),
+    },
+    ({page_ids}) => runBatch(page_ids, (page_id) => deletePage({page_id})),
   );
 };

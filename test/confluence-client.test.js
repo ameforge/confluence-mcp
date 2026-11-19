@@ -32,3 +32,19 @@ test("a write that hits a 503 is never replayed", async () => {
   );
   assert.deepEqual(methods, ["PUT"]);
 });
+
+// A timed-out write may have been saved; only a GET may be retried.
+for (const [method, says] of [
+  ["PUT", /PUT within 30s; it may still have been saved, so do not retry/],
+  ["GET", /within 30s; safe to retry/],
+]) {
+  test(`a timed-out ${method} says what it means for a retry`, async () => {
+    globalThis.fetch = async () => {
+      throw new DOMException(
+        "The operation was aborted due to timeout",
+        "TimeoutError",
+      );
+    };
+    await assert.rejects(confluenceRequest(method, "/content/1", {}), says);
+  });
+}

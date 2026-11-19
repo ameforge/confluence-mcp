@@ -43,6 +43,24 @@ test("update_page without body keeps the current body and bumps the version", as
   assert.equal(body.title, "New");
 });
 
+test("update_page with an outdated expected_version writes nothing", async () => {
+  const sent = stubFetch(() => ({
+    body: {storage: {value: "<p>edited by someone</p>"}},
+    space: {key: "ENG"},
+    title: "Old",
+    version: {number: 5},
+  }));
+
+  await assert.rejects(
+    () => updatePage({body: "<p>mine</p>", expected_version: 4, page_id: "42"}),
+    /at version 5, not 4.*Nothing was written/,
+  );
+  assert.deepEqual(
+    sent.map((r) => r.method),
+    ["GET"],
+  );
+});
+
 test("upload_attachment never replaces a same-name attachment by default", async () => {
   const dir = await mkdtemp(join(tmpdir(), "conf-mcp-"));
   const file = join(dir, "a.png");

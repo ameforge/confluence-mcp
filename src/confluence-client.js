@@ -28,6 +28,9 @@ const HEADERS = {
 // 500 on a write may already have saved it.
 const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
 const MAX_RETRIES = 2;
+// A Confluence that stops answering would otherwise hang the tool call forever.
+// Uploads get none: a large file may rightly take longer.
+const TIMEOUT_MS = 30_000;
 
 export const confluenceRequest = async (method, path, body, attempt = 0) => {
   const multipart = body instanceof FormData;
@@ -37,6 +40,15 @@ export const confluenceRequest = async (method, path, body, attempt = 0) => {
     body: multipart ? body : body ? JSON.stringify(body) : undefined,
     headers: multipart ? {...base, "X-Atlassian-Token": "nocheck"} : HEADERS,
     method,
+    signal: multipart ? undefined : AbortSignal.timeout(TIMEOUT_MS),
+  }).catch((err) => {
+    if (err.name !== "TimeoutError") throw err;
+    // A write that timed out may have been saved; a blind retry can save it twice.
+    throw new Error(
+      method === "GET"
+        ? `Confluence did not answer within ${TIMEOUT_MS / 1000}s; safe to retry`
+        : `Confluence did not answer the ${method} within ${TIMEOUT_MS / 1000}s; it may still have been saved, so do not retry: ask the user to check in Confluence first`,
+    );
   });
   if (!res.ok) {
     if (

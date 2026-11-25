@@ -64,6 +64,8 @@ Official setup guides:
 
 | Variable              | Required | Description                                                        |
 | --------------------- | -------- | ------------------------------------------------------------------ |
+| `ATLASSIAN_MCP_USAGE` | no       | Set to `off` to turn off the local usage log (see Usage log)       |
+| `ATLASSIAN_MCP_TOOLS` | no       | Comma-separated tool or package names to expose (default all)      |
 | `CONFLUENCE_HOST`     | yes      | Base URL, e.g. `https://conf.company.com`                          |
 | `CONFLUENCE_USERNAME` | yes*     | Confluence username; `ATLASSIAN_USERNAME` is read when it is unset |
 | `CONFLUENCE_PASSWORD` | yes*     | Confluence password; `ATLASSIAN_PASSWORD` is read when it is unset |
@@ -90,6 +92,7 @@ Official setup guides:
 | `add_comment`         | Add a comment to a page                                                                                                                 | `page_id`, `body`                                                                                              |
 | `get_comments`        | Get comments on a page                                                                                                                  | `page_id`                                                                                                      |
 | `get_user`            | Resolve a user's display name and profile from userKey/username                                                                         | `key` or `username`                                                                                            |
+| `usage_report`        | Done, calls and errors from the local usage log, per package and tool; with `format` set to `html`, also writes and opens a board page  | optional: `days` (default 30), `format` (`text` or `html`)                                                     |
 
 ### Notes
 
@@ -104,6 +107,19 @@ Official setup guides:
 - `search_pages` uses CQL syntax, e.g. `type=page AND space=ENG AND title~"deploy"`. Use `ancestor=<id>` to list every page under a page, or `parent=<id>` for direct children only.
 - For large pages, `get_page`/`get_page_by_title` return at most 40000 characters of body by default (to avoid exceeding tool-output token limits). Control with `body_format`: `storage` (default, XHTML) | `view` (rendered HTML) | `none` (metadata only). Page through large bodies with `body_start` + `body_limit`; check the `truncated` flag in the result. Or pass `save_to` with a local file path to write the full body there (fails if the file exists) and get metadata only back.
 - All logs go to stderr; stdout is reserved for the MCP protocol.
+
+## Usage log
+
+Every tool call is logged to a local file with the time, the package, the tool name and whether the call succeeded. Arguments and content are never logged, and nothing is sent anywhere. All the Atlassian packages share this one file.
+
+The file is `$XDG_CONFIG_HOME/atlassian-mcp/usage.jsonl` when `XDG_CONFIG_HOME` is set. Otherwise it is `%APPDATA%\atlassian-mcp\usage.jsonl` on Windows and `~/.config/atlassian-mcp/usage.jsonl` elsewhere. Set `ATLASSIAN_MCP_USAGE=off` to stop logging. A log that cannot be written never fails a tool call.
+
+Call the `usage_report` tool to read the log. Its optional parameters are:
+
+- `days`: how many days back to count (default 30).
+- `format`: `text` (default) gives a summary per package and tool. `html` also writes `board.html` next to the log and opens it in the browser. The board has range buttons for 7, 30 and 90 days and all time, totals for done, calls and errors, a done per day chart, a table per tool and a button that saves a PNG share card.
+
+Done counts the write calls that succeeded. Read tools are those whose names start with `get_`, `list_`, `search_`, `find_`, `download_`, `generate_` or `compare_`. Every other tool counts as a write. Because the file is shared, the report also counts calls made through the other packages.
 
 ## Example prompts
 

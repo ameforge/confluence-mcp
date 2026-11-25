@@ -1,5 +1,6 @@
 import {dirname, resolve} from "node:path";
 import {fileURLToPath} from "node:url";
+import {productRequest} from "@ameforge/atlassian-request";
 import dotenv from "dotenv";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -24,46 +25,23 @@ const HEADERS = {
   "Content-Type": "application/json",
 };
 
-// Data Center answers transient 429/5xx under load. Only GET is replayed: a
-// 500 on a write may already have saved it.
-const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
-const MAX_RETRIES = 2;
-// A Confluence that stops answering would otherwise hang the tool call forever.
-// Uploads get none: a large file may rightly take longer.
-const TIMEOUT_MS = 30_000;
+// Only GET is replayed: a 500 on a write may already have saved it.
+const {send} = productRequest({
+  name: "Confluence",
+  parse: (res) => (res.status === 204 ? null : res.json()),
+  replayable: ["GET"],
+});
 
-export const confluenceRequest = async (method, path, body, attempt = 0) => {
+export const confluenceRequest = (method, path, body) => {
   const multipart = body instanceof FormData;
   // fetch sets the multipart boundary itself; Confluence rejects uploads without the XSRF opt-out.
   const {"Content-Type": _, ...base} = HEADERS;
-  const res = await fetch(`${BASE}${path}`, {
+  return send(method, `${BASE}${path}`, {
     body: multipart ? body : body ? JSON.stringify(body) : undefined,
     headers: multipart ? {...base, "X-Atlassian-Token": "nocheck"} : HEADERS,
-    method,
-    signal: multipart ? undefined : AbortSignal.timeout(TIMEOUT_MS),
-  }).catch((err) => {
-    if (err.name !== "TimeoutError") throw err;
-    // A write that timed out may have been saved; a blind retry can save it twice.
-    throw new Error(
-      method === "GET"
-        ? `Confluence did not answer within ${TIMEOUT_MS / 1000}s; safe to retry`
-        : `Confluence did not answer the ${method} within ${TIMEOUT_MS / 1000}s; it may still have been saved, so do not retry: ask the user to check in Confluence first`,
-    );
+    // Uploads get no timeout: a large file may rightly take longer.
+    timeout: !multipart,
   });
-  if (!res.ok) {
-    if (
-      method === "GET" &&
-      attempt < MAX_RETRIES &&
-      RETRY_STATUS.has(res.status)
-    ) {
-      await new Promise((r) => setTimeout(r, 250 * 2 ** attempt));
-      return confluenceRequest(method, path, body, attempt + 1);
-    }
-    const text = await res.text();
-    throw new Error(`Confluence API ${res.status}: ${text}`);
-  }
-  if (res.status === 204) return null;
-  return res.json();
 };
 
 /** Fetch raw bytes from a site-relative path, e.g. an attachment's `_links.download`. */

@@ -13,7 +13,7 @@ import {registerUpdatePage} from "./tools/page/update-page.js";
 import {registerListSpaces} from "./tools/space/list-spaces.js";
 import {registerGetUser} from "./tools/user/get-user.js";
 
-/** @param {any} server An McpServer, or anything with its registerTool. */
+/** @param {any} server */
 export const registerTools = (server) => {
   registerGetPage(server);
   registerCreatePage(server);

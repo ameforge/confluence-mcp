@@ -26,7 +26,7 @@ const HEADERS = {
 };
 
 // Only GET is replayed: a 500 on a write may already have saved it.
-const {send} = productRequest({
+const {fetchHeaders, send} = productRequest({
   name: "Confluence",
   parse: (res) => (res.status === 204 ? null : res.json()),
   replayable: ["GET"],
@@ -44,9 +44,8 @@ export const confluenceRequest = (method, path, body) => {
   });
 };
 
-/** Fetch raw bytes from a site-relative path, e.g. an attachment's `_links.download`. */
 export const confluenceDownload = async (path) => {
-  const res = await fetch(`${HOST}${path}`, {
+  const res = await fetchHeaders(`${HOST}${path}`, {
     headers: {Authorization: HEADERS.Authorization},
   });
   if (!res.ok) {
@@ -56,14 +55,12 @@ export const confluenceDownload = async (path) => {
   return Buffer.from(await res.arrayBuffer());
 };
 
-/** Fetch a page with the version/space/body needed to build an edit payload. */
 export const readForEdit = (pageId) =>
   confluenceRequest(
     "GET",
     `/content/${pageId}?expand=version,space,body.storage`,
   );
 
-/** Short result for a write, so tools don't echo the whole page body back. */
 export const pageSummary = ({_links, id, title, version}) => ({
   id,
   title,
@@ -72,9 +69,7 @@ export const pageSummary = ({_links, id, title, version}) => ({
 });
 
 /**
- * Write a page's storage body, auto-incrementing the version. Resolves to a pageSummary.
  * @param {string} pageId
- * Pass `parentId` (and `spaceKey` if the parent is in another space) to move it.
  * @param {{value: string, current: any, title?: string, parentId?: string, spaceKey?: string}} opts
  */
 export const writePage = (

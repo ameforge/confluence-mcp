@@ -8,7 +8,6 @@ import {registerDeletePage} from "../src/tools/page/delete-page.js";
 import {movePage, registerMovePage} from "../src/tools/page/move-page.js";
 import {updatePage} from "../src/tools/page/update-page.js";
 
-// Records each request and answers from `reply(method, path)`.
 const stubFetch = (reply) => {
   const sent = [];
   globalThis.fetch = async (url, init) => {

@@ -1,7 +1,4 @@
 /**
- * Wire a plain handler (input -> data, throws on failure) into an MCP tool:
- * catches thrown errors into the isError content shape, and formats a
- * returned string as-is or a returned value as pretty JSON.
  * @param {any} server
  * @param {string} name
  * @param {any} config

@@ -1,6 +1,4 @@
-// Runs fn once per page ID, in order, and reports every outcome. A failure on
-// one ID must not stop the rest, but it must still surface as an error so the
-// caller does not take a partly failed batch for a success.
+// A failed ID must not stop the rest, but the batch still throws so a partial failure is not a success.
 export const runBatch = async (ids, fn) => {
   const lines = [];
   let failed = 0;

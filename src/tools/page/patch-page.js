@@ -2,7 +2,6 @@ import {z} from "zod";
 import {readForEdit, writePage} from "../../confluence-client.js";
 import {defineTool} from "../../define-tool.js";
 
-/** Apply edits in order; throws before anything is written if any edit doesn't match exactly once. */
 export const applyEdits = (body, edits) =>
   edits.reduce((acc, {new_string, old_string}, i) => {
     const where = edits.length > 1 ? `edits[${i}]: ` : "";

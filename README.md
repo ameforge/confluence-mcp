@@ -1,6 +1,6 @@
 # Confluence mcp
 
-MCP server for Confluence Server/Data Center (REST API). Lets an AI assistant (Claude Code, Claude Desktop, ...) read and write your Confluence directly.
+MCP server for Confluence Server/Data Center (REST API). It lets an AI assistant such as Claude Code or Claude Desktop read and write your Confluence.
 
 ## Requirements
 
@@ -9,7 +9,19 @@ MCP server for Confluence Server/Data Center (REST API). Lets an AI assistant (C
 
 ## Quick start
 
-Use Claude Code CLI. Run the command in a regular terminal, not inside a Claude Code session. Pick the block for your shell, since each one continues lines differently.
+You can let Claude Code install it for you. Paste this prompt into a Claude Code session and replace the values with your own:
+
+```text
+Add the MCP server "conf-mcp" with `claude mcp add`, running `npx -y conf-mcp@latest`, with these environment variables:
+CONFLUENCE_HOST=https://conf.company.com
+CONFLUENCE_USERNAME=your_username
+CONFLUENCE_PASSWORD=your_password
+Use the command syntax for my shell, then run `claude mcp list` to check that it connects.
+```
+
+The prompt puts your password into the conversation. If you would rather keep it out, run the command below yourself, in a regular terminal rather than a Claude Code session. Either way, restart Claude Code afterwards so it loads the server.
+
+Pick the block for your shell, since each one continues lines differently.
 
 bash / zsh (macOS, Linux, Git Bash or WSL on Windows):
 
@@ -90,34 +102,34 @@ Official setup guides:
 | `search_pages`        | Search content using CQL (Confluence Query Language)                                                                                    | `cql`, `limit` (optional), `start` (optional)                                                                  |
 | `list_spaces`         | List spaces, or fetch a single space by key                                                                                             | `space_key` (optional), `limit` (optional)                                                                     |
 | `add_comment`         | Add a comment to a page                                                                                                                 | `page_id`, `body`                                                                                              |
-| `get_comments`        | Get comments on a page                                                                                                                  | `page_id`                                                                                                      |
+| `get_comments`        | Get comments on a page, 50 per call                                                                                                     | `page_id`, optional: `start` (default 0)                                                                       |
 | `get_user`            | Resolve a user's display name and profile from userKey/username                                                                         | `key` or `username`                                                                                            |
 | `usage_report`        | Done, calls and errors from the local usage log, per package and tool; with `format` set to `html`, also writes and opens a board page  | optional: `days` (default 30), `format` (`text` or `html`)                                                     |
 
 ### Notes
 
-- Page `body` (create_page/update_page): pass Markdown with `body_format='markdown'` (auto-converted server-side) or raw Confluence storage format (XHTML) by default. Storage format required for Confluence macros (code, panel, expand, TOC) which Markdown cannot express. Example storage: `<p>Content</p>`, `<ul><li>Item 1</li></ul>`.
+- Page `body` (create_page/update_page): pass Markdown with `body_format='markdown'` (the server converts it), or raw Confluence storage format (XHTML), which is the default. Confluence macros (code, panel, expand, TOC) need storage format, because Markdown cannot express them. Example storage: `<p>Content</p>`, `<ul><li>Item 1</li></ul>`.
 - Comment `body` (add_comment): must be Confluence storage format (XHTML) only.
-- `update_page` is a full replace — to change only the title, omit `body` to keep the existing content (and vice versa).
+- `update_page` replaces the whole page. To change only the title, omit `body` to keep the existing content, and the other way round.
 - Pass `expected_version` (the `version.number` from `get_page`) to `update_page` so it refuses to write when someone saved the page after you read it; the error says so and nothing is written.
-- `patch_page` replaces one exact substring in storage format (XHTML) without resending the full page body, useful for targeted edits to large pages where `update_page` is impractical. `old_string` must match exactly once; errors if found 0 or multiple times. Pass `edits` to make several replacements as one page version: they apply in order, and if any one fails to match, nothing is written.
+- `patch_page` replaces one exact substring in storage format (XHTML) without resending the full page body, which suits small edits to large pages. `old_string` must match exactly once; the call fails if it matches zero or several times. Pass `edits` to make several replacements as one page version: they apply in order, and if any one fails to match, nothing is written.
 - `create_page`, `update_page` and `patch_page` return a short summary (`id`, `title`, `version`, `url`) instead of the full page body.
 - `get_page` accepts a pasted URL in place of an ID: `viewpage.action?pageId=...`, `/spaces/KEY/pages/ID/...` or `/display/SPACE/Title`. Tiny links (`/x/...`) are not supported.
 - `delete_page` only moves the page to trash; you can restore it from the Confluence UI.
 - `search_pages` uses CQL syntax, e.g. `type=page AND space=ENG AND title~"deploy"`. Use `ancestor=<id>` to list every page under a page, or `parent=<id>` for direct children only.
-- For large pages, `get_page`/`get_page_by_title` return at most 40000 characters of body by default (to avoid exceeding tool-output token limits). Control with `body_format`: `storage` (default, XHTML) | `view` (rendered HTML) | `none` (metadata only). Page through large bodies with `body_start` + `body_limit`; check the `truncated` flag in the result. Or pass `save_to` with a local file path to write the full body there (fails if the file exists) and get metadata only back.
+- For large pages, `get_page`/`get_page_by_title` return at most 40000 characters of body by default (to avoid exceeding tool-output token limits). Choose the format with `body_format`: `storage` (default, XHTML) | `view` (rendered HTML) | `none` (metadata only). Page through large bodies with `body_start` + `body_limit`; check the `truncated` flag in the result. Or pass `save_to` with a local file path to write the full body there (fails if the file exists) and get metadata only back.
 - All logs go to stderr; stdout is reserved for the MCP protocol.
 
 ## Usage log
 
-Every tool call is logged to a local file with the time, the package, the tool name and whether the call succeeded. Arguments and content are never logged, and nothing is sent anywhere. All the Atlassian packages share this one file.
+Every tool call except `usage_report` is logged to a local file with the time, the package, the tool name and whether the call succeeded. Arguments and content are never logged, and nothing is sent anywhere. All the Atlassian packages share this one file.
 
 The file is `$XDG_CONFIG_HOME/atlassian-mcp/usage.jsonl` when `XDG_CONFIG_HOME` is set. Otherwise it is `%APPDATA%\atlassian-mcp\usage.jsonl` on Windows and `~/.config/atlassian-mcp/usage.jsonl` elsewhere. Set `ATLASSIAN_MCP_USAGE=off` to stop logging. A log that cannot be written never fails a tool call.
 
 Call the `usage_report` tool to read the log. Its optional parameters are:
 
 - `days`: how many days back to count (default 30).
-- `format`: `text` (default) gives a summary per package and tool. `html` also writes `board.html` next to the log and opens it in the browser. The board has range buttons for 7, 30 and 90 days and all time, totals for done, calls and errors, a done per day chart, a table per tool and a button that saves a PNG share card.
+- `format`: `text` (default) gives a summary per package and tool. `html` also writes `board.html` next to the log and opens it in the browser. The board has range buttons for 7, 30 and 90 days, for `days` when it is another number, and for all time, totals for done, calls and errors, a done per day chart, a table per tool and a Share card button that shows a card you can download as a PNG or copy.
 
 Done counts the write calls that succeeded. Read tools are those whose names start with `get_`, `list_`, `search_`, `find_`, `download_`, `generate_` or `compare_`. Every other tool counts as a write. Because the file is shared, the report also counts calls made through the other packages.
 
@@ -130,9 +142,9 @@ Done counts the write calls that succeeded. Read tools are those whose names sta
 
 ## Troubleshooting
 
-- 401/403: recheck `CONFLUENCE_USERNAME`/`CONFLUENCE_PASSWORD` and whether the account can access the space.
-- Connection/timeout: verify `CONFLUENCE_HOST` format (starts with `https://`, no trailing `/`), and whether VPN/internal network is required.
-- Error logs: every failed tool call is written to stderr with a timestamp and the tool name, and the startup line shows the server version. On Windows, Claude Code keeps this in `%LOCALAPPDATA%\claude-cli-nodejs\Cache\<project>\mcp-logs-<server name>\`, where `<server name>` is the name you gave the server in your MCP config (for example `conf-mcp`).
+- 401/403: recheck `CONFLUENCE_TOKEN` when it is set, otherwise `CONFLUENCE_USERNAME`/`CONFLUENCE_PASSWORD`, and whether the account can access the space.
+- Connection/timeout: verify that `CONFLUENCE_HOST` includes the scheme (`https://`), and whether VPN/internal network is required.
+- Error logs: every failed tool call except `usage_report` is written to stderr with a timestamp and the tool name, and the startup line shows the server version. On Windows, Claude Code keeps this in `%LOCALAPPDATA%\claude-cli-nodejs\Cache\<project>\mcp-logs-<server name>\`, where `<server name>` is the name you gave the server in your MCP config (for example `conf-mcp`).
 - Reporting a bug: open an issue at <https://github.com/ameforge/atlassian-mcp/issues> with the server version, the tool you called and the matching log lines. Logs can contain page content and internal URLs, so remove anything sensitive before you post. Nothing is sent anywhere automatically.
 
 ## Development

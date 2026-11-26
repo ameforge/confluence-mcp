@@ -2,9 +2,7 @@ import assert from "node:assert/strict";
 import {test} from "node:test";
 import {confluenceRequest} from "../src/confluence-client.js";
 
-// Retries, timeouts and empty bodies are tested once in packages/request.
-// Here: Confluence replays only GET, read through the timeout message that
-// uses the same list; a 500 or a timeout on a write may come after it saved.
+// Retries and timeouts are tested in packages/request; here only that Confluence replays GET alone.
 for (const [method, says] of [
   [
     "PUT",

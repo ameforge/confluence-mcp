@@ -4,7 +4,6 @@ import {defineTool} from "../../define-tool.js";
 import {bodyParamsSchema, expandForBody, formatPage} from "../../page-body.js";
 import {getPageByTitle} from "./get-page-by-title.js";
 
-/** Turn a page ID or a Confluence page URL into {page_id} or {space_key, title}. */
 export const parsePageRef = (ref) => {
   if (/^\d+$/.test(ref)) return {page_id: ref};
   let url;

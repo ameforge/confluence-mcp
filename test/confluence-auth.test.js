@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
 
-// Set before the module reads them. Empty values also keep dotenv from
-// filling them in from a local .env.
+// Set before the module reads them; empty values also keep dotenv from filling them from a local .env.
 process.env.CONFLUENCE_TOKEN = "";
 process.env.CONFLUENCE_USERNAME = "";
 process.env.CONFLUENCE_PASSWORD = "conf-pass";
